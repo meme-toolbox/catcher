@@ -3,6 +3,7 @@ package ml.memelau.catcher.client.spring.boot.autoconfigure;
 
 import ml.memelau.catcher.client.Additioner;
 import ml.memelau.catcher.client.CatcherClient;
+import ml.memelau.catcher.client.ErrorEventFactory;
 import ml.memelau.catcher.client.UncaughtExceptionCatcher;
 import ml.memelau.catcher.client.servlet.CatcherFilter;
 import ml.memelau.catcher.client.spring.CatcherExceptionResolver;
@@ -53,11 +54,17 @@ public class CatcherClientAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public UncaughtExceptionCatcher uncaughtExceptionCatcher(CatcherClientProperties properties, CatcherClient catcherClient) {
+    public ErrorEventFactory errorEventFactory(CatcherClientProperties properties) {
+        return new ErrorEventFactory(properties.getEnv(), properties.getAppName());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UncaughtExceptionCatcher uncaughtExceptionCatcher(ErrorEventFactory errorEventFactory, CatcherClient catcherClient, @Autowired(required = false) List<Additioner> additioners) {
         return UncaughtExceptionCatcher.builder()
                                        .client(catcherClient)
-                                       .appName(properties.getAppName())
-                                       .env(properties.getEnv())
+                                       .errorEventFactory(errorEventFactory)
+                                       .additioners(additioners)
                                        .build();
     }
 
@@ -80,9 +87,9 @@ public class CatcherClientAutoConfiguration {
         }
 
         @Bean
-        public CatcherExceptionResolver catcherExceptionResolver(CatcherClientProperties properties, CatcherClient catcherClient, @Autowired(required = false) List<Additioner> additioners) {
-            return new CatcherExceptionResolver(properties.getEnv(), properties.getAppName(), catcherClient, Optional.ofNullable(additioners)
-                                                                                                                     .orElseGet(Collections::emptyList));
+        public CatcherExceptionResolver catcherExceptionResolver(ErrorEventFactory errorEventFactory, CatcherClient catcherClient, @Autowired(required = false) List<Additioner> additioners) {
+            return new CatcherExceptionResolver(errorEventFactory, catcherClient, Optional.ofNullable(additioners)
+                                                                                          .orElseGet(Collections::emptyList));
         }
 
     }

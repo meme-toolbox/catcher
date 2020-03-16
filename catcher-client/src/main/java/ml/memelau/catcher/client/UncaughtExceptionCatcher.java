@@ -1,13 +1,9 @@
 package ml.memelau.catcher.client;
 
-import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NonNull;
-import ml.memelau.catcher.event.ErrorEvent;
 import ml.memelau.catcher.event.java.JavaErrorEvent;
 
-import java.net.InetAddress;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,22 +11,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UncaughtExceptionCatcher {
 
-    @NonNull
     private CatcherClient client;
 
-    @NonNull
-    private String env;
+    private ErrorEventFactory errorEventFactory;
 
-    @NonNull
-    private String appName;
-
-    private final List<Additioner> additioners;
-
-    private final String ip = Try.of(() -> InetAddress.getLocalHost().getHostAddress())
-                                 .getOrElse("unknown");
-
-    private final String hostname = Try.of(() -> InetAddress.getLocalHost().getHostName())
-                                       .getOrElse("unknown");
+    private List<Additioner> additioners;
 
     {
         Thread.UncaughtExceptionHandler handler = Thread.getDefaultUncaughtExceptionHandler();
@@ -42,7 +27,7 @@ public class UncaughtExceptionCatcher {
     }
 
     private void alarmUncaughtException(Throwable throwable) {
-        JavaErrorEvent event = ErrorEvent.newEvent(JavaErrorEvent.class, appName, env, hostname, ip);
+        JavaErrorEvent event = errorEventFactory.newEvent(JavaErrorEvent.class);
         event.setThrowable(throwable);
         client.send(event, additioners);
     }

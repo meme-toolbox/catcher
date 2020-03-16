@@ -15,6 +15,9 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
+/**
+ * @author meme
+ */
 public class SpringServletWebAdditioner implements Additioner {
 
     @Override

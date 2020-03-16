@@ -1,19 +1,15 @@
 package ml.memelau.catcher.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import lombok.*;
 
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
  * @author meme
  */
-@Getter(AccessLevel.PROTECTED)
+@Getter
 @Setter(AccessLevel.PROTECTED)
 public abstract class ErrorEvent {
 
@@ -55,32 +51,102 @@ public abstract class ErrorEvent {
     protected String ip;
 
     /**
+     * 发生时间
+     */
+    protected LocalDateTime occurredTime;
+
+    /**
      * 额外信息
      */
-    @Getter(AccessLevel.PUBLIC)
-    @Setter(AccessLevel.PUBLIC)
-    protected Map<String, Object> additions = new HashMap<>();
-
-    @SneakyThrows
-    public static <T extends ErrorEvent> T newEvent(Class<T> type, String appName, String env, String hostname, String ip) {
-        Constructor<T> constructor = type.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        T event = constructor.newInstance();
-        event.setAppName(appName);
-        event.setEnv(env);
-        event.setHostname(hostname);
-        event.setIp(ip);
-        return event;
-    }
-
-    @SneakyThrows
-    public static ErrorEvent newEvent() {
-        return new DefaultErrorEvent();
-    }
+    protected Map<String, Object> additions;
 
     @SneakyThrows
     @Override
     public String toString() {
         return OBJECT_MAPPER.writeValueAsString(this);
+    }
+
+
+    public static class DefaultErrorEvent extends ErrorEvent {
+
+        @Override
+        public String getAppName() {
+            return super.getAppName();
+        }
+
+        @Override
+        public String getEnv() {
+            return super.getEnv();
+        }
+
+        @Override
+        public String getHostname() {
+            return super.getHostname();
+        }
+
+        @Override
+        public String getIp() {
+            return super.getIp();
+        }
+
+        @Override
+        public String getEventType() {
+            return super.getEventType();
+        }
+
+        @Override
+        public String getErrorType() {
+            return super.getErrorType();
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return super.getErrorMessage();
+        }
+
+        @Override
+        public Map<String, Object> getAdditions() {
+            return super.getAdditions();
+        }
+
+        @Override
+        public void setEventType(String eventType) {
+            super.setEventType(eventType);
+        }
+
+        @Override
+        public void setErrorType(String errorType) {
+            super.setErrorType(errorType);
+        }
+
+        @Override
+        public void setErrorMessage(String errorMessage) {
+            super.setErrorMessage(errorMessage);
+        }
+
+        @Override
+        public void setAdditions(Map<String, Object> additions) {
+            super.setAdditions(additions);
+        }
+
+        @Override
+        public void setAppName(String appName) {
+            super.setAppName(appName);
+        }
+
+        @Override
+        public void setEnv(String env) {
+            super.setEnv(env);
+        }
+
+        @Override
+        public void setHostname(String hostname) {
+            super.setHostname(hostname);
+        }
+
+        @Override
+        public void setIp(String ip) {
+            super.setIp(ip);
+        }
     }
 }
