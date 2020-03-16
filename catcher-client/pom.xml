@@ -13,12 +13,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>ml.memelau</groupId>
+            <artifactId>catcher-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
         </dependency>
         <dependency>
-            <groupId>ml.memelau</groupId>
-            <artifactId>catcher-core</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

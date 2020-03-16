@@ -63,7 +63,7 @@ public abstract class ErrorEvent {
 
     @SneakyThrows
     public static <T extends ErrorEvent> T newEvent(Class<T> type, String appName, String env, String hostname, String ip) {
-        Constructor<T> constructor = type.getConstructor();
+        Constructor<T> constructor = type.getDeclaredConstructor();
         constructor.setAccessible(true);
         T event = constructor.newInstance();
         event.setAppName(appName);

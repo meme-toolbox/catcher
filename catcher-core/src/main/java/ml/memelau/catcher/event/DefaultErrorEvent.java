@@ -29,42 +29,42 @@ public class DefaultErrorEvent extends ErrorEvent {
     }
 
     @Override
-    protected String getEventType() {
+    public String getEventType() {
         return super.getEventType();
     }
 
     @Override
-    protected String getErrorType() {
+    public String getErrorType() {
         return super.getErrorType();
     }
 
     @Override
-    protected String getErrorMessage() {
+    public String getErrorMessage() {
         return super.getErrorMessage();
     }
 
     @Override
-    protected Map<String, Object> getAdditions() {
+    public Map<String, Object> getAdditions() {
         return super.getAdditions();
     }
 
     @Override
-    protected void setEventType(String eventType) {
+    public void setEventType(String eventType) {
         super.setEventType(eventType);
     }
 
     @Override
-    protected void setErrorType(String errorType) {
+    public void setErrorType(String errorType) {
         super.setErrorType(errorType);
     }
 
     @Override
-    protected void setErrorMessage(String errorMessage) {
+    public void setErrorMessage(String errorMessage) {
         super.setErrorMessage(errorMessage);
     }
 
     @Override
-    protected void setAdditions(Map<String, Object> additions) {
+    public void setAdditions(Map<String, Object> additions) {
         super.setAdditions(additions);
     }
 

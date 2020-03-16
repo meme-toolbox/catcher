@@ -8,6 +8,7 @@ import ml.memelau.catcher.event.ErrorEvent;
 import ml.memelau.catcher.event.java.JavaErrorEvent;
 
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Optional;
 
 @Builder
@@ -22,6 +23,8 @@ public class UncaughtExceptionCatcher {
 
     @NonNull
     private String appName;
+
+    private final List<Additioner> additioners;
 
     private final String ip = Try.of(() -> InetAddress.getLocalHost().getHostAddress())
                                  .getOrElse("unknown");
@@ -41,7 +44,7 @@ public class UncaughtExceptionCatcher {
     private void alarmUncaughtException(Throwable throwable) {
         JavaErrorEvent event = ErrorEvent.newEvent(JavaErrorEvent.class, appName, env, hostname, ip);
         event.setThrowable(throwable);
-        client.send(event);
+        client.send(event, additioners);
     }
 
 

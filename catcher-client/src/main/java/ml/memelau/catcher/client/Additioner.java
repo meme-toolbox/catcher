@@ -2,8 +2,8 @@ package ml.memelau.catcher.client;
 
 import ml.memelau.catcher.event.ErrorEvent;
 
-public interface Additioner<T extends ErrorEvent> {
+public interface Additioner {
 
-    void addTo(T errorEvent);
+    void addTo(ErrorEvent errorEvent);
 
 }

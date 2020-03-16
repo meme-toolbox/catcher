@@ -3,7 +3,6 @@ package ml.memelau.catcher.client.spring.boot.autoconfigure;
 import lombok.Getter;
 import lombok.Setter;
 import ml.memelau.catcher.client.Additioner;
-import ml.memelau.catcher.event.ErrorEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -19,7 +18,7 @@ public class CatcherClientProperties {
 
     public static final String PREFIX = "catcher.client";
 
-    public List<Class<Additioner<? super ErrorEvent>>> additioners;
+    public List<Class<Additioner>> additioners;
 
     private String endpoint;
 

@@ -1,53 +1,30 @@
-package ml.memelau.catcher.client.spring;
+package ml.memelau.catcher.client.additioner.spring;
 
 import io.vavr.control.Try;
-import lombok.RequiredArgsConstructor;
 import ml.memelau.catcher.client.Additioner;
-import ml.memelau.catcher.client.CatcherClient;
 import ml.memelau.catcher.event.ErrorEvent;
-import ml.memelau.catcher.event.java.WebErrorEvent;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
-@RequiredArgsConstructor
-@Order(Ordered.HIGHEST_PRECEDENCE)
-public class CatcherWebInterceptor extends AbstractHandlerExceptionResolver {
-
-    private final String env;
-
-    private final String appName;
-
-    private final String ip = Try.of(() -> InetAddress.getLocalHost().getHostAddress())
-                                 .getOrElse("unknown");
-
-    private final String hostname = Try.of(() -> InetAddress.getLocalHost().getHostName())
-                                       .getOrElse("unknown");
-
-    private final CatcherClient catcherClient;
-
-    private final List<Additioner<? super ErrorEvent>> additioners;
+public class SpringServletWebAdditioner implements Additioner {
 
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        WebErrorEvent event = ErrorEvent.newEvent(WebErrorEvent.class, appName, env, hostname, ip);
-        event.setThrowable(ex);
-        event.setRequestDetails(resolveRequestDetails(request));
-        catcherClient.send(event, additioners);
-        return null;
+    public void addTo(ErrorEvent errorEvent) {
+        Optional.of(RequestContextHolder.currentRequestAttributes())
+                .map(ServletRequestAttributes.class::cast)
+                .map(ServletRequestAttributes::getRequest)
+                .ifPresent(request -> errorEvent.getAdditions().put("requestDetails", resolveRequestDetails(request)));
     }
+
 
     private String resolveRequestDetails(HttpServletRequest request) {
         return String.format("%s\n%s\n\n%s", resolveRequestLine(request), resolveHeaders(request), resolveRequestBody(request));
@@ -74,5 +51,4 @@ public class CatcherWebInterceptor extends AbstractHandlerExceptionResolver {
                 Objects.nonNull(request.getQueryString()) ? "?".concat(request.getQueryString()) : "",
                 request.getProtocol());
     }
-
 }
