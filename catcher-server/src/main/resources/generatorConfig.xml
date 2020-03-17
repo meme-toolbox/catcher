@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="aomi-mapper" targetRuntime="MyBatis3" defaultModelType="flat">
+
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        <property name="useActualColumnNames" value="false"/>
+
+        <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.FluentBuilderMethodsPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+        <plugin type="org.mybatis.generator.plugins.CaseInsensitiveLikePlugin"/>
+
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+
+        <!-- TODO 数据库链接信息-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://rm-wz9cx0j1qeen1opba8o.mysql.rds.aliyuncs.com:3306/catcher_dev?generateSimpleParameterMetadata=true"
+                        userId="catcher_dev"
+                        password="Aomi@2020">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <!-- 建议设置为true使用 java.time API -->
+            <property name="useJSR310Types" value="false"/>
+            <property name="forceBigDecimals" value="true" />
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="ml.memelau.catcher.server.model"
+                            targetProject="./src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="false"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="mapper"
+                         targetProject="./src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="ml.memelau.catcher.server.mapper"
+                             targetProject="./src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- TODO 生成模型信息-->
+        <table tableName="app_group" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+        <table tableName="app_group_member" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+        <table tableName="error_event" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+        <table tableName="error_event_comment" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+        <table tableName="error_event_count" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+        <table tableName="error_event_log" enableDeleteByExample="false" enableDeleteByPrimaryKey="false"/>
+    </context>
+</generatorConfiguration>

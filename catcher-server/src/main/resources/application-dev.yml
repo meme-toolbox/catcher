@@ -1,0 +1,19 @@
+server:
+  port: 8099
+
+spring:
+  mail:
+    host: smtp.exmail.qq.com
+    port: 465
+    username: aomi_admin1@mem853.com
+    password: Aa3.14159
+  redis:
+    host: 39.108.117.26
+    port: 26379
+    password: Macau2016
+
+logging:
+  level:
+    ml.memelau.catcher: debug
+
+

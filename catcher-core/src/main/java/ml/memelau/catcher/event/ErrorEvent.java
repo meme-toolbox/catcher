@@ -68,6 +68,65 @@ public abstract class ErrorEvent {
 
 
     public static class DefaultErrorEvent extends ErrorEvent {
+        @Override
+        protected void setEventType(String eventType) {
+            super.setEventType(eventType);
+        }
+
+        @Override
+        protected void setErrorType(String errorType) {
+            super.setErrorType(errorType);
+        }
+
+        @Override
+        protected void setErrorMessage(String errorMessage) {
+            super.setErrorMessage(errorMessage);
+        }
+
+        @Override
+        protected void setAppName(String appName) {
+            super.setAppName(appName);
+        }
+
+        @Override
+        protected void setEnv(String env) {
+            super.setEnv(env);
+        }
+
+        @Override
+        protected void setHostname(String hostname) {
+            super.setHostname(hostname);
+        }
+
+        @Override
+        protected void setIp(String ip) {
+            super.setIp(ip);
+        }
+
+        @Override
+        protected void setOccurredTime(LocalDateTime occurredTime) {
+            super.setOccurredTime(occurredTime);
+        }
+
+        @Override
+        protected void setAdditions(Map<String, Object> additions) {
+            super.setAdditions(additions);
+        }
+
+        @Override
+        public String getEventType() {
+            return super.getEventType();
+        }
+
+        @Override
+        public String getErrorType() {
+            return super.getErrorType();
+        }
+
+        @Override
+        public String getErrorMessage() {
+            return super.getErrorMessage();
+        }
 
         @Override
         public String getAppName() {
@@ -90,63 +149,13 @@ public abstract class ErrorEvent {
         }
 
         @Override
-        public String getEventType() {
-            return super.getEventType();
-        }
-
-        @Override
-        public String getErrorType() {
-            return super.getErrorType();
-        }
-
-        @Override
-        public String getErrorMessage() {
-            return super.getErrorMessage();
+        public LocalDateTime getOccurredTime() {
+            return super.getOccurredTime();
         }
 
         @Override
         public Map<String, Object> getAdditions() {
             return super.getAdditions();
-        }
-
-        @Override
-        public void setEventType(String eventType) {
-            super.setEventType(eventType);
-        }
-
-        @Override
-        public void setErrorType(String errorType) {
-            super.setErrorType(errorType);
-        }
-
-        @Override
-        public void setErrorMessage(String errorMessage) {
-            super.setErrorMessage(errorMessage);
-        }
-
-        @Override
-        public void setAdditions(Map<String, Object> additions) {
-            super.setAdditions(additions);
-        }
-
-        @Override
-        public void setAppName(String appName) {
-            super.setAppName(appName);
-        }
-
-        @Override
-        public void setEnv(String env) {
-            super.setEnv(env);
-        }
-
-        @Override
-        public void setHostname(String hostname) {
-            super.setHostname(hostname);
-        }
-
-        @Override
-        public void setIp(String ip) {
-            super.setIp(ip);
         }
     }
 }

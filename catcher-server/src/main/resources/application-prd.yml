@@ -1,0 +1,25 @@
+spring:
+  mail:
+    host: smtp.exmail.qq.com
+    port: 465
+    username: aomiadmin@mem853.com
+    password: Aomiadmin2017
+  redis:
+    host: r-j6c11f6273286f44.redis.rds.aliyuncs.com
+    port: 6379
+    password: Macau2016
+  elasticsearch:
+    rest:
+      uris: es-cn-v0h1kgc3d000i81ca.elasticsearch.aliyuncs.com:9200
+      username: aomi-content
+      password: aomi-content
+      max-conn-per-route: 600
+      max-conn-total: 1200
+
+logbook:
+  strategy: without-body
+
+server:
+  undertow:
+    worker-threads: 600
+    io-threads: 600

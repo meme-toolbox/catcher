@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: catcher-server
+  profiles:
+    active: dev
+  mail:
+    properties:
+      mail:
+        smtp:
+          writetimeout: 10000
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            port: ${spring.mail.port}
+            class: javax.net.ssl.SSLSocketFactory
+          connectiontimeout: 30000
+          ssl:
+            trust: ${spring.mail.host}
+          timeout: 20000
+  http:
+    encoding:
+      force: true
+
+server:
+  error:
+    include-exception: true
+    include-stacktrace: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - loggers
+          - metrics
+          - info
+          - health
+          - threaddump

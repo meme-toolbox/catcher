@@ -1,0 +1,19 @@
+spring:
+  mail:
+    host: smtp.exmail.qq.com
+    port: 465
+    username: aomi_admin1@mem853.com
+    password: Aa3.14159
+  redis:
+    host: r-wz925fb8fbfcd7c4.redis.rds.aliyuncs.com
+    port: 6379
+    password: Macau2016
+  elasticsearch:
+    rest:
+      uris: es-cn-v641b70q3000a21tn.elasticsearch.aliyuncs.com:9200
+      username: aomi-content
+      password: aomi-content
+
+logging:
+  level:
+    mo.aomi: debug
