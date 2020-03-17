@@ -5,9 +5,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Rule {
+public class SendLevel {
 
-    private List<SendLevel> sendLevels;
+    private Long count;
 
+    private List<String> mailAddresses;
 
 }

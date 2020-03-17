@@ -1,15 +1,25 @@
 package ml.memelau.catcher.server.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.Hashing;
+import lombok.SneakyThrows;
 import ml.memelau.catcher.event.ErrorEvent;
 import ml.memelau.catcher.server.mapper.ErrorEventCountMapper;
 import ml.memelau.catcher.server.mapper.ErrorEventMapper;
 import ml.memelau.catcher.server.model.AppGroup;
+import ml.memelau.catcher.server.model.ErrorEventCount;
+import ml.memelau.catcher.server.model.ErrorEventCountExample;
 import ml.memelau.catcher.server.model.ErrorEventExample;
+import ml.memelau.catcher.server.vo.Rule;
+import ml.memelau.catcher.server.vo.SendLevel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
@@ -26,8 +36,17 @@ public class ErrorEventService {
     @Autowired
     private ErrorEventCountMapper errorEventCountMapper;
 
-    public void receive(ErrorEvent.DefaultErrorEvent event, String accessKey) {
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    @Autowired
+    private MailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String from;
+
+    @SneakyThrows
+    public void receive(ErrorEvent.DefaultErrorEvent event, String accessKey) {
         Integer groupId = appGroupService.getByAccessKey(accessKey)
                                          .map(AppGroup::getId)
                                          .orElse(0);
@@ -52,15 +71,73 @@ public class ErrorEventService {
         example.createCriteria()
                .andEventHashEqualTo(errorEvent.getEventHash());
         Integer errorEventId = errorEventMapper.selectByExample(example)
-                                          .stream()
-                                          .findAny()
-                                          .map(ml.memelau.catcher.server.model.ErrorEvent::getId)
-                                          .orElse(null);
+                                               .stream()
+                                               .findAny()
+                                               .map(ml.memelau.catcher.server.model.ErrorEvent::getId)
+                                               .orElse(null);
         if (Objects.isNull(errorEventId)) {
-
+            errorEventMapper.insert(errorEvent);
         }
 
+        errorEventId = errorEventMapper.selectByExample(example)
+                                       .stream()
+                                       .findAny()
+                                       .map(ml.memelau.catcher.server.model.ErrorEvent::getId)
+                                       .orElse(null);
 
+        ErrorEventCount errorEventCount = new ErrorEventCount();
+        errorEventCount.setEventId(errorEventId);
+        errorEventCount.setOccurredTime(Date.from(event.getOccurredTime().atZone(ZoneId.systemDefault()).toInstant()));
+        errorEventCount.setAdditions(objectMapper.writeValueAsString(event.getAdditions()));
+        errorEventCountMapper.insert(errorEventCount);
+
+        alarm(groupId, errorEventId, errorEvent);
+
+    }
+
+    private void alarm(Integer groupId, Integer errorEventId, ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+        ErrorEventCountExample example = new ErrorEventCountExample();
+        example.createCriteria()
+               .andEventIdEqualTo(errorEventId);
+        long count = errorEventCountMapper.countByExample(example);
+        appGroupService.getRuleById(groupId)
+                       .ifPresent(rule -> sendAlarmByRule(rule, count, errorEvent));
+    }
+
+    private void sendAlarmByRule(Rule rule, long count, ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+        rule.getSendLevels()
+            .stream()
+            .filter(sendLevel -> sendLevel.getCount() <= count)
+            .max(Comparator.comparing(SendLevel::getCount))
+            .ifPresent(sendLevel -> sendLevel.getMailAddresses()
+                                             .forEach(address -> sendAlarm(address, errorEvent))
+            );
+
+    }
+
+    private void sendAlarm(String address, ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(address);
+        mail.setSubject(getTitle(errorEvent));
+        mail.setText(getContent(errorEvent));
+        mail.setFrom(from);
+        mailSender.send();
+    }
+
+    private String getContent(ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+        return String.format(
+                ALARM_FORMAT,
+                errorEvent.getErrorType(),
+                errorEvent.getHostname(),
+                errorEvent.getIp(),
+                errorEvent.getErrorMessage());
+    }
+
+    private static final String ALARM_FORMAT =
+            "错误类型: %s\nhostname: %s\nIp: %s\n错误信息: %s\n";
+
+    public String getTitle(ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+        return String.format("警报:[%s][%s][%s][%s]", errorEvent.getEnv(), errorEvent.getCreateTime(), errorEvent.getAppName(), errorEvent.getErrorType());
     }
 
     private String getEventHash(ml.memelau.catcher.server.model.ErrorEvent errorEvent) {

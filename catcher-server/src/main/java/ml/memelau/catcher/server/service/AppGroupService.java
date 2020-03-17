@@ -64,4 +64,21 @@ public class AppGroupService {
                      .stream()
                      .findAny();
     }
+
+    public Optional<Rule> getRuleById(Integer id) {
+        AppGroupExample example = new AppGroupExample();
+        example.createCriteria()
+               .andIdEqualTo(id);
+        return mapper.selectByExample(example)
+                     .stream()
+                     .map(AppGroup::getRule)
+                     .map(ruleStr -> {
+                         try {
+                             return objectMapper.readValue(ruleStr, Rule.class);
+                         } catch (JsonProcessingException e) {
+                             throw new RuntimeException(e);
+                         }
+                     })
+                     .findAny();
+    }
 }
