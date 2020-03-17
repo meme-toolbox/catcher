@@ -18,14 +18,29 @@ spring:
           ssl:
             trust: ${spring.mail.host}
           timeout: 20000
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
   http:
     encoding:
       force: true
+
+
 
 server:
   error:
     include-exception: true
     include-stacktrace: always
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  typeAliasesPackage: ml.memelau.catcher.server.model
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
 
 management:
   endpoints:

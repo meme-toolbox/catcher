@@ -12,6 +12,7 @@ import ml.memelau.catcher.server.model.ErrorEventCountExample;
 import ml.memelau.catcher.server.model.ErrorEventExample;
 import ml.memelau.catcher.server.vo.Rule;
 import ml.memelau.catcher.server.vo.SendLevel;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -91,17 +93,22 @@ public class ErrorEventService {
         errorEventCount.setAdditions(objectMapper.writeValueAsString(event.getAdditions()));
         errorEventCountMapper.insert(errorEventCount);
 
-        alarm(groupId, errorEventId, errorEvent);
+        //TODO event driven
+        alarm(groupId, errorEventId);
 
     }
 
-    private void alarm(Integer groupId, Integer errorEventId, ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
+    private void alarm(Integer groupId, Integer errorEventId) {
         ErrorEventCountExample example = new ErrorEventCountExample();
         example.createCriteria()
                .andEventIdEqualTo(errorEventId);
         long count = errorEventCountMapper.countByExample(example);
-        appGroupService.getRuleById(groupId)
-                       .ifPresent(rule -> sendAlarmByRule(rule, count, errorEvent));
+
+        ml.memelau.catcher.server.model.ErrorEvent errorEvent = errorEventMapper.selectByPrimaryKey(errorEventId);
+        if (Objects.equals(errorEvent.getHandlingState(), 0)) {
+            appGroupService.getRuleById(groupId)
+                           .ifPresent(rule -> sendAlarmByRule(rule, count, errorEvent));
+        }
     }
 
     private void sendAlarmByRule(Rule rule, long count, ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
@@ -121,12 +128,13 @@ public class ErrorEventService {
         mail.setSubject(getTitle(errorEvent));
         mail.setText(getContent(errorEvent));
         mail.setFrom(from);
-        mailSender.send();
+        mailSender.send(mail);
     }
 
     private String getContent(ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
         return String.format(
                 ALARM_FORMAT,
+                errorEvent.getId(),
                 errorEvent.getErrorType(),
                 errorEvent.getHostname(),
                 errorEvent.getIp(),
@@ -134,7 +142,7 @@ public class ErrorEventService {
     }
 
     private static final String ALARM_FORMAT =
-            "错误类型: %s\nhostname: %s\nIp: %s\n错误信息: %s\n";
+            "错误ID: %s\n错误类型: %s\nhostname: %s\nIp: %s\n错误信息: %s\n";
 
     public String getTitle(ml.memelau.catcher.server.model.ErrorEvent errorEvent) {
         return String.format("警报:[%s][%s][%s][%s]", errorEvent.getEnv(), errorEvent.getCreateTime(), errorEvent.getAppName(), errorEvent.getErrorType());
@@ -149,5 +157,28 @@ public class ErrorEventService {
                 .putUnencodedChars(errorEvent1.getEventType())
                 .putInt(errorEvent1.getGroupId())
         ).toString();
+    }
+
+    public List<ml.memelau.catcher.server.model.ErrorEvent> listByDuration(Integer groupId, Date startTime, Date endTime) {
+        ErrorEventExample example = new ErrorEventExample();
+        example.createCriteria()
+               .andGroupIdEqualTo(groupId)
+               .andUpdateTimeBetween(startTime, endTime);
+        return errorEventMapper.selectByExampleWithBLOBs(example);
+    }
+
+    public List<ErrorEventCount> listByEventId(Integer eventId) {
+        ErrorEventCountExample example = new ErrorEventCountExample();
+        example.createCriteria()
+               .andEventIdEqualTo(eventId);
+        example.setOrderByClause(" ORDER BY id DESC");
+        return errorEventCountMapper.selectByExampleWithBLOBsWithRowbounds(example, new RowBounds(0, 20));
+    }
+
+    public void setHandlingState(Integer id, Integer handlingState) {
+        ml.memelau.catcher.server.model.ErrorEvent errorEvent = new ml.memelau.catcher.server.model.ErrorEvent();
+        errorEvent.setId(id);
+        errorEvent.setHandlingState(handlingState);
+        errorEventMapper.updateByPrimaryKeySelective(errorEvent);
     }
 }

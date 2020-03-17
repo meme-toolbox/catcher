@@ -1,5 +1,7 @@
 package ml.memelau.catcher.client;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.vavr.control.Try;
 import lombok.Builder;
 import lombok.NonNull;
@@ -50,6 +52,7 @@ public class CatcherClient {
                                   additioners.forEach(additioner -> additioner.addTo(event));
                                   httpClient.baseUrl(endpoint)
                                             .port(port)
+                                            .headers(headers -> headers.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON))
                                             .post()
                                             .uri(String.format("/?access_key=%s", accessKey))
                                             .send(ByteBufFlux.fromString(Flux.just(event)

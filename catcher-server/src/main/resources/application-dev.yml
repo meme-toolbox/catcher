@@ -11,6 +11,12 @@ spring:
     host: 39.108.117.26
     port: 26379
     password: Macau2016
+  datasource:
+    url: jdbc:mysql://rm-wz9cx0j1qeen1opba8o.mysql.rds.aliyuncs.com:3306/catcher_dev?useUnicode=true&characterEncoding=utf8
+    username: catcher_dev
+    password: Aomi@2020
+    hikari:
+      maximum-pool-size: 2
 
 logging:
   level:

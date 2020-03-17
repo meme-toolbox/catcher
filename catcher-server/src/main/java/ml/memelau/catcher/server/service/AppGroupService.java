@@ -2,6 +2,7 @@ package ml.memelau.catcher.server.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import ml.memelau.catcher.server.mapper.AppGroupMapper;
 import ml.memelau.catcher.server.model.AppGroup;
 import ml.memelau.catcher.server.model.AppGroupExample;
@@ -69,7 +70,7 @@ public class AppGroupService {
         AppGroupExample example = new AppGroupExample();
         example.createCriteria()
                .andIdEqualTo(id);
-        return mapper.selectByExample(example)
+        return mapper.selectByExampleWithBLOBs(example)
                      .stream()
                      .map(AppGroup::getRule)
                      .map(ruleStr -> {
@@ -80,5 +81,13 @@ public class AppGroupService {
                          }
                      })
                      .findAny();
+    }
+
+    @SneakyThrows
+    public void setRuleByGroupId(Integer groupId, Rule rule) {
+        AppGroup appGroup = new AppGroup();
+        appGroup.setId(groupId);
+        appGroup.setRule(objectMapper.writeValueAsString(rule));
+        mapper.updateByPrimaryKeySelective(appGroup);
     }
 }

@@ -1,7 +1,14 @@
 package ml.memelau.catcher.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -53,6 +60,8 @@ public abstract class ErrorEvent {
     /**
      * 发生时间
      */
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     protected LocalDateTime occurredTime;
 
     /**
@@ -69,47 +78,47 @@ public abstract class ErrorEvent {
 
     public static class DefaultErrorEvent extends ErrorEvent {
         @Override
-        protected void setEventType(String eventType) {
+        public void setEventType(String eventType) {
             super.setEventType(eventType);
         }
 
         @Override
-        protected void setErrorType(String errorType) {
+        public void setErrorType(String errorType) {
             super.setErrorType(errorType);
         }
 
         @Override
-        protected void setErrorMessage(String errorMessage) {
+        public void setErrorMessage(String errorMessage) {
             super.setErrorMessage(errorMessage);
         }
 
         @Override
-        protected void setAppName(String appName) {
+        public void setAppName(String appName) {
             super.setAppName(appName);
         }
 
         @Override
-        protected void setEnv(String env) {
+        public void setEnv(String env) {
             super.setEnv(env);
         }
 
         @Override
-        protected void setHostname(String hostname) {
+        public void setHostname(String hostname) {
             super.setHostname(hostname);
         }
 
         @Override
-        protected void setIp(String ip) {
+        public void setIp(String ip) {
             super.setIp(ip);
         }
 
         @Override
-        protected void setOccurredTime(LocalDateTime occurredTime) {
+        public void setOccurredTime(LocalDateTime occurredTime) {
             super.setOccurredTime(occurredTime);
         }
 
         @Override
-        protected void setAdditions(Map<String, Object> additions) {
+        public void setAdditions(Map<String, Object> additions) {
             super.setAdditions(additions);
         }
 
