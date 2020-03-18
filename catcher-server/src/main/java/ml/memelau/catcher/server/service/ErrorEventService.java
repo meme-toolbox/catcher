@@ -181,4 +181,8 @@ public class ErrorEventService {
         errorEvent.setHandlingState(handlingState);
         errorEventMapper.updateByPrimaryKeySelective(errorEvent);
     }
+
+    public ml.memelau.catcher.server.model.ErrorEvent getById(Integer eventId) {
+        return errorEventMapper.selectByPrimaryKey(eventId);
+    }
 }

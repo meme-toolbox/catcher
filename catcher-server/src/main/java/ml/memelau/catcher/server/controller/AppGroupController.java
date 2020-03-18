@@ -1,6 +1,8 @@
 package ml.memelau.catcher.server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import ml.memelau.catcher.server.service.AppGroupService;
 import ml.memelau.catcher.server.vo.AppGroupResp;
@@ -13,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+
+
 @RestController
 @RequestMapping("app-groups")
 public class AppGroupController {
@@ -20,18 +24,21 @@ public class AppGroupController {
     @Autowired
     private AppGroupService service;
 
+    @ApiOperation("创建应用组")
     @PostMapping
-    public void create(@RequestParam String name) {
+    public void create(@ApiParam("名称") @RequestParam String name) {
         service.create(name);
     }
 
+    @ApiOperation("获取应用组")
     @GetMapping
     public List<AppGroupResp> list() {
         return service.list();
     }
 
-    @PostMapping("{groupId}/rules")
-    public void setRuleByGroupId(@PathVariable Integer groupId, @RequestBody Rule rule) {
+    @ApiOperation("设置报警规则")
+    @PostMapping("rules")
+    public void setRuleByGroupId(@ApiParam("应用组ID") @RequestParam Integer groupId, @RequestBody Rule rule) {
         service.setRuleByGroupId(groupId, rule);
     }
 

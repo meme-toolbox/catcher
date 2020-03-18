@@ -25,7 +25,11 @@ spring:
     encoding:
       force: true
 
-
+swagger:
+  enabled: false
+  title: @project.artifactId@
+  version: @version@
+  base-package: ml.memelau.catcher.server.controller
 
 server:
   error:
